@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: var(--primary);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  --color-secondary: var(--secondary);
+  --color-order: var(--order);
+
+  --color-mute: var(--mute);
+
+  --animate-fade-in-left: fade-in-left 0.4s ease;
+  --animate-fade-inlright: fade-in-right 0.4s ease;
+  --animate-spin: spin 0.4s ease;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes fade-in-left {
+    from {
+      opacity: 1;
+      position: translateX(20px);
+    }
+    to {
+      opacity: 0;
+      position: trnaslateX(0);
+    }
+  }
+
+  @keyframes fade-in-right {
+    from {
+      opacity: 1;
+      position: translateX(-20px);
+    }
+    to {
+      opacity: 0;
+      position: trnaslateX(0);
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --primary: #fc8a06;
+    /* bg is also this foreground */
+    --foreground: #ffffff;
+    --background: #ffffff;
+    --secondary: #03081f;
+    --order: #028643;
+    --mute: #e2e2e2;
+  }
+
+  .dark {
+    --primary: #fc8a06;
+    /* bg is also this foreground */
+    --foreground: #ffffff;
+    --background: #0d0d0d;
+    --secondary: #121f58;
+    --order: #028643;
+    --mute: #e2e2e2;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background transition-all duration-400;
+    font-family: 'Poppins', sans-serif;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+}
+
+@utitlity mbtn {
+  @apply px-4 py-2 bg-secondary text-foreground transition-all hover:bg-order;
+}
+
+@utility flare {
+  @apply px-4 py-2 bg-primary text-secondary;
+}
