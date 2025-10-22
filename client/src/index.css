@@ -15,6 +15,8 @@
   --animate-fade-inlright: fade-in-right 0.4s ease;
   --animate-spin: spin 0.4s ease;
 
+  --animate-skeleton: skeleton 1s infinite;
+
   @keyframes spin {
     0% {
       transform: rotate(0deg);
@@ -27,22 +29,31 @@
   @keyframes fade-in-left {
     from {
       opacity: 1;
-      position: translateX(20px);
+      transform: translateX(20px);
     }
     to {
       opacity: 0;
-      position: trnaslateX(0);
+      transform: translateX(0);
     }
   }
 
   @keyframes fade-in-right {
     from {
       opacity: 1;
-      position: translateX(-20px);
+      transform: translateX(-20px);
     }
     to {
       opacity: 0;
-      position: trnaslateX(0);
+      transform: trnaslateX(0);
+    }
+  }
+
+  @keyframes skeleton {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
     }
   }
 }
@@ -91,4 +102,25 @@
 
 @utility flare {
   @apply px-4 py-2 bg-primary text-secondary;
+}
+
+
+ .skeleton {
+  position: relative;
+}
+
+ .skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.4),
+    transparent
+  );
+  animation: skeleton 1s linear infinite;
 }

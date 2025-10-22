@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 export const useInView = (options={}) => {
  const ref = useRef(null);
- consst [isVisible, setIsVisible] = useState(flase)
+ const [isVisible, setIsVisible] = useState(false)
 
  const memOptions = useMemo(()=> options, [JSON.stringify(options)])
  useEffect(()=> {
