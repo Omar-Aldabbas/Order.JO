@@ -181,4 +181,15 @@ class UserController extends Controller
         if ($request->filled('to_date')) $query->whereDate('created_at', '<=', $request->to_date);
         return response()->json($query->latest()->paginate(10));
     }
+
+    public function upgradeRole(Request $request)
+    {
+        $request->validate([
+            'role' => 'required|in:restaurant,courier'
+        ]);
+
+        $user = Auth::user();
+        $user->syncRoles($request->role);
+        return response()->json(['message' => "Your role has been updated to {$request->role}"]);
+    }
 }
