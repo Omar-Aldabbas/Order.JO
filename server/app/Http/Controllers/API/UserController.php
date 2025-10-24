@@ -13,6 +13,7 @@ use App\Models\Reservation;
 use App\Models\Notification;
 use App\Models\RestaurantRating;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Jobs\SendNotification;
 
 class UserController extends Controller
@@ -20,24 +21,19 @@ class UserController extends Controller
     public function getRestaurants(Request $request)
     {
         $query = Restaurant::query();
-        if ($request->has('type')) $query->where('type', $request->type);
-        return response()->json($query->with('menuItems')->get());
+        if ($request->filled('type')) $query->where('type', $request->type);
+        if ($request->filled('service_type')) $query->where('service_type', $request->service_type);
+        return response()->json($query->with('menuItems.variants')->paginate(10));
     }
 
     public function getMenu(Request $request, $restaurant_id)
     {
-        $query = MenuItem::where('restaurant_id', $restaurant_id);
-
-        if ($request->has('type')) {
-            $query->where('type', $request->type);
-        }
-
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        return response()->json($query->get());
+        $query = MenuItem::where('restaurant_id', $restaurant_id)->with('variants');
+        if ($request->filled('type')) $query->where('type', $request->type);
+        if ($request->filled('search')) $query->where('name', 'like', '%' . $request->search . '%');
+        return response()->json($query->paginate(10));
     }
+
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
@@ -47,11 +43,13 @@ class UserController extends Controller
             'latitude' => 'sometimes|numeric',
             'longitude' => 'sometimes|numeric',
         ]);
-        if ($request->hasFile('profile_image')) $user->profile_image = $request->file('profile_image')->store('profile_images', 'public');
-        if ($request->has('name')) $user->name = $request->name;
-        if ($request->has('latitude')) $user->latitude = $request->latitude;
-        if ($request->has('longitude')) $user->longitude = $request->longitude;
-        $user->save();
+        if ($request->hasFile('profile_image')) {
+            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
+            $user->profile_image = $request->file('profile_image')->store('profile_images', 'public');
+        }
+        $user->fill($request->only('name', 'latitude', 'longitude'))->save();
         return response()->json($user);
     }
 
@@ -62,10 +60,19 @@ class UserController extends Controller
             'restaurant_id' => 'required|exists:restaurants,id',
             'items' => 'required|array',
             'items.*.menu_item_id' => 'required|exists:menu_items,id',
+            'items.*.menu_item_variant_id' => 'nullable|exists:menu_item_variants,id',
             'items.*.quantity' => 'required|integer|min:1'
         ]);
         $total = 0;
-        foreach ($request->items as $item) $total += MenuItem::find($item['menu_item_id'])->price * $item['quantity'];
+        foreach ($request->items as $item) {
+            $menuItem = MenuItem::findOrFail($item['menu_item_id']);
+            $price = $menuItem->price;
+            if (!empty($item['menu_item_variant_id'])) {
+                $variant = $menuItem->variants()->find($item['menu_item_variant_id']);
+                if ($variant) $price = $variant->price;
+            }
+            $total += $price * $item['quantity'];
+        }
         $order = Order::create([
             'user_id' => $user->id,
             'restaurant_id' => $request->restaurant_id,
@@ -73,15 +80,22 @@ class UserController extends Controller
             'total_price' => $total
         ]);
         foreach ($request->items as $item) {
+            $menuItem = MenuItem::findOrFail($item['menu_item_id']);
+            $price = $menuItem->price;
+            if (!empty($item['menu_item_variant_id'])) {
+                $variant = $menuItem->variants()->find($item['menu_item_variant_id']);
+                if ($variant) $price = $variant->price;
+            }
             OrderItem::create([
                 'order_id' => $order->id,
                 'menu_item_id' => $item['menu_item_id'],
+                'menu_item_variant_id' => $item['menu_item_variant_id'] ?? null,
                 'quantity' => $item['quantity'],
-                'price' => MenuItem::find($item['menu_item_id'])->price
+                'price' => $price
             ]);
         }
         SendNotification::dispatch($order, 'restaurant', 'New order received');
-        return response()->json($order->load('orderItems', 'courier'));
+        return response()->json($order->load('orderItems.menuItem.variants', 'restaurant', 'courier'));
     }
 
     public function cancelOrder($order_id)
@@ -89,8 +103,7 @@ class UserController extends Controller
         $user = Auth::user();
         $order = Order::where('user_id', $user->id)->findOrFail($order_id);
         if (in_array($order->status, ['pending', 'accepted', 'preparing'])) {
-            $order->status = 'canceled_by_user';
-            $order->save();
+            $order->update(['status' => 'canceled_by_user']);
             SendNotification::dispatch($order, 'restaurant', 'Order canceled by user');
             return response()->json(['message' => 'Order canceled']);
         }
@@ -121,8 +134,7 @@ class UserController extends Controller
         $user = Auth::user();
         $reservation = Reservation::where('user_id', $user->id)->findOrFail($reservation_id);
         if (in_array($reservation->status, ['pending', 'accepted', 'in_progress'])) {
-            $reservation->status = 'canceled_by_user';
-            $reservation->save();
+            $reservation->update(['status' => 'canceled_by_user']);
             SendNotification::dispatch($reservation, 'restaurant', 'Reservation canceled by user');
             return response()->json(['message' => 'Reservation canceled']);
         }
@@ -132,28 +144,41 @@ class UserController extends Controller
     public function rateRestaurant(Request $request, $order_id)
     {
         $user = Auth::user();
-        $order = Order::where('id', $order_id)->where('user_id', $user->id)->where('status', 'delivered')->firstOrFail();
-        $request->validate(['rating' => 'required|integer|min:1|max:5', 'review' => 'nullable|string|max:1000']);
+        $order = Order::where('id', $order_id)
+                      ->where('user_id', $user->id)
+                      ->where('status', 'delivered')
+                      ->firstOrFail();
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'nullable|string|max:1000'
+        ]);
         $rating = RestaurantRating::updateOrCreate(
             ['order_id' => $order->id],
-            ['user_id' => $user->id, 'restaurant_id' => $order->restaurant_id, 'rating' => $request->rating, 'review' => $request->review]
+            [
+                'user_id' => $user->id,
+                'restaurant_id' => $order->restaurant_id,
+                'rating' => $request->rating,
+                'review' => $request->review
+            ]
         );
+        SendNotification::dispatch($rating, 'restaurant', 'Your restaurant received a new rating');
         return response()->json($rating);
     }
 
     public function notifications()
     {
-        return response()->json(Notification::where('user_id', Auth::id())->orderBy('created_at','desc')->get());
+        return response()->json(
+            Notification::where('user_id', Auth::id())->orderBy('created_at', 'desc')->paginate(10)
+        );
     }
 
-    public function ordersHistory()
+    public function ordersHistory(Request $request)
     {
         $user = Auth::user();
-        $orders = Order::where('user_id', $user->id)
-            ->with(['orderItems.menuItem', 'restaurant', 'courier'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-        return response()->json($orders);
+        $query = Order::where('user_id', $user->id)->with(['orderItems.menuItem.variants', 'restaurant', 'courier']);
+        if ($request->filled('status')) $query->where('status', $request->status);
+        if ($request->filled('from_date')) $query->whereDate('created_at', '>=', $request->from_date);
+        if ($request->filled('to_date')) $query->whereDate('created_at', '<=', $request->to_date);
+        return response()->json($query->latest()->paginate(10));
     }
-    
 }

@@ -11,9 +11,10 @@ use App\Jobs\SendNotification;
 
 class CourierController extends Controller
 {
-    public function availableOrders()
+    public function availableOrders(Request $request)
     {
-        return response()->json(Order::whereNull('courier_id')->where('status', 'ready')->with('restaurant')->get());
+        $query = Order::whereNull('courier_id')->where('status', 'ready')->with('restaurant');
+        return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
     public function acceptOrder($order_id)
@@ -32,13 +33,15 @@ class CourierController extends Controller
         return response()->json(['message' => 'Delivery completed']);
     }
 
-    public function deliveriesHistory()
+    public function deliveriesHistory(Request $request)
     {
-        return response()->json(Order::where('courier_id', Auth::id())->with(['user', 'restaurant'])->latest()->get());
+        $query = Order::where('courier_id', Auth::id())->with(['user', 'restaurant'])->latest();
+        return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
-    public function notifications()
+    public function notifications(Request $request)
     {
-        return response()->json(Notification::where('courier_id', Auth::id())->latest()->get());
+        $query = Notification::where('courier_id', Auth::id())->latest();
+        return response()->json($query->paginate($request->get('per_page', 15)));
     }
 }

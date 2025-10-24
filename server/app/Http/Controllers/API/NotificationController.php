@@ -9,21 +9,16 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-
-        $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return response()->json($notifications);
+        $query = Notification::where('user_id', $user->id)->latest();
+        return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
     public function markAsRead($id)
     {
         $user = Auth::user();
-
         $notification = Notification::where('user_id', $user->id)->findOrFail($id);
         $notification->read_at = now();
         $notification->save();
@@ -34,7 +29,6 @@ class NotificationController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-
         $notification = Notification::where('user_id', $user->id)->findOrFail($id);
         $notification->delete();
 
@@ -44,7 +38,6 @@ class NotificationController extends Controller
     public function clearAll()
     {
         $user = Auth::user();
-
         Notification::where('user_id', $user->id)->delete();
 
         return response()->json(['message' => 'All notifications cleared']);

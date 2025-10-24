@@ -7,19 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\SupportTicket;
 use App\Models\Order;
 use App\Models\Reservation;
-use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\SendNotification;
 
 class SupportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = SupportTicket::with(['user', 'order', 'reservation'])
-                    ->orderBy('created_at', 'desc')
-                    ->get();
-
-        return response()->json($tickets);
+        $query = SupportTicket::with(['user', 'order', 'reservation'])->latest();
+        if ($request->filled('status')) $query->where('status', $request->status);
+        if ($request->filled('type')) $query->where('type', $request->type);
+        if ($request->filled('from_date')) $query->whereDate('created_at', '>=', $request->from_date);
+        if ($request->filled('to_date')) $query->whereDate('created_at', '<=', $request->to_date);
+        return response()->json($query->paginate(10));
     }
 
     public function store(Request $request)
@@ -52,43 +52,42 @@ class SupportController extends Controller
     public function resolve(Request $request, $id)
     {
         $ticket = SupportTicket::findOrFail($id);
-        $ticket->status = 'resolved';
-        $ticket->resolution_message = $request->input('resolution_message', null);
-        $ticket->save();
+        $ticket->update([
+            'status' => 'resolved',
+            'resolution_message' => $request->input('resolution_message')
+        ]);
 
         SendNotification::dispatch($ticket, 'user', 'Your support ticket has been resolved by the support team.');
 
         return response()->json(['message' => 'Ticket resolved successfully']);
     }
 
-    public function refundOrder($id)
+    public function refundOrder($order_id)
     {
-        $ticket = SupportTicket::where('type', 'order')->where('related_id', $id)->firstOrFail();
-        $order = Order::findOrFail($id);
+        $ticket = SupportTicket::where('type', 'order')->where('related_id', $order_id)->firstOrFail();
+        $order = Order::findOrFail($order_id);
 
-        $order->status = 'refunded';
-        $order->save();
-
-        $ticket->status = 'resolved';
-        $ticket->resolution_message = 'Refund issued for the order.';
-        $ticket->save();
+        $order->update(['status' => 'refunded']);
+        $ticket->update([
+            'status' => 'resolved',
+            'resolution_message' => 'Refund issued for the order.'
+        ]);
 
         SendNotification::dispatch($order, 'user', 'Your order has been refunded after support review.');
 
         return response()->json(['message' => 'Order refunded successfully']);
     }
 
-    public function cancelReservation($id)
+    public function cancelReservation($reservation_id)
     {
-        $ticket = SupportTicket::where('type', 'reservation')->where('related_id', $id)->firstOrFail();
-        $reservation = Reservation::findOrFail($id);
+        $ticket = SupportTicket::where('type', 'reservation')->where('related_id', $reservation_id)->firstOrFail();
+        $reservation = Reservation::findOrFail($reservation_id);
 
-        $reservation->status = 'canceled_by_support';
-        $reservation->save();
-
-        $ticket->status = 'resolved';
-        $ticket->resolution_message = 'Reservation canceled by support.';
-        $ticket->save();
+        $reservation->update(['status' => 'canceled_by_support']);
+        $ticket->update([
+            'status' => 'resolved',
+            'resolution_message' => 'Reservation canceled by support.'
+        ]);
 
         SendNotification::dispatch($reservation, 'user', 'Your reservation was canceled after support review.');
 

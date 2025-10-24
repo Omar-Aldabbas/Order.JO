@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Restaurant;
 use App\Models\Reservation;
 use App\Models\Notification;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -21,30 +22,63 @@ class AdminController extends Controller
         ]);
     }
 
-    public function users()
+    public function users(Request $request)
     {
-        return response()->json(User::with('roles')->get());
+        $query = User::with('roles');
+
+        if ($request->has('role')) {
+            $query->whereHas('roles', fn($q) => $q->where('name', $request->role));
+        }
+
+        return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
-    public function orders()
+    public function orders(Request $request)
     {
-        return response()->json(Order::with(['user', 'restaurant', 'courier'])->latest()->get());
+        $query = Order::with(['user', 'restaurant', 'courier']);
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('restaurant_id')) {
+            $query->where('restaurant_id', $request->restaurant_id);
+        }
+
+        return response()->json($query->latest()->paginate($request->get('per_page', 15)));
     }
 
-    public function reservations()
+    public function reservations(Request $request)
     {
-        return response()->json(Reservation::with(['user', 'restaurant'])->latest()->get());
+        $query = Reservation::with(['user', 'restaurant']);
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('restaurant_id')) {
+            $query->where('restaurant_id', $request->restaurant_id);
+        }
+
+        return response()->json($query->latest()->paginate($request->get('per_page', 15)));
     }
 
     public function deleteUser($id)
     {
-        $u = User::findOrFail($id);
-        $u->delete();
+        $user = User::findOrFail($id);
+        $user->delete();
+
         return response()->json(['message' => 'User deleted']);
     }
 
-    public function notifications()
+    public function notifications(Request $request)
     {
-        return response()->json(Notification::latest()->get());
+        $query = Notification::query();
+
+        if ($request->has('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        return response()->json($query->latest()->paginate($request->get('per_page', 15)));
     }
 }
