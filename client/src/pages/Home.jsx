@@ -1,4 +1,6 @@
+import { BannersSection } from '../components/BannersSection'
 import { CategoriesSection } from '../components/CategoriesSection'
+import { FAQSection } from '../components/FAQSection'
 import { GetAppSection } from '../components/GetAppSection'
 import { Hero } from '../components/Hero'
 import { Navbar } from '../components/Navbar'
@@ -19,6 +21,8 @@ export const Home = () => {
       <div className="px-8">
         <OrdersRestaurantsSection/>
         <GetAppSection/>
+        <BannersSection/>
+        <FAQSection/>
       </div>
     </>
   )
