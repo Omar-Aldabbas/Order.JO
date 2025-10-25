@@ -1,4 +1,5 @@
 import { CategoriesSection } from '../components/CategoriesSection'
+import { GetAppSection } from '../components/GetAppSection'
 import { Hero } from '../components/Hero'
 import { Navbar } from '../components/Navbar'
 import { OrdersRestaurantsSection } from '../components/OrderRestaurantsSection'
@@ -17,6 +18,7 @@ export const Home = () => {
 
       <div className="px-8">
         <OrdersRestaurantsSection/>
+        <GetAppSection/>
       </div>
     </>
   )
