@@ -7,7 +7,7 @@ export const CategoryCard = ({ options }) => {
       className="block"
     >
       <div className="rounded-lg w-full group cursor-pointer bg-background hover:shadow-md transition-shadow lg:bg-[#f5f5f5]">
-        <div className="h-50 w-full overflow-hidden rounded-lg">
+        <div className="h-50 w-full overflow-hidden rounded-xl">
           <img
             src={options.img}
             alt={options.alt}
@@ -16,11 +16,11 @@ export const CategoryCard = ({ options }) => {
         </div>
 
         <div className="px-4 py-2 space-y-1">
-          <h4 className="font-semibold text-secondary text-lg">
+          <h4 className="font-semibold text-secondary text-md">
             {options.name}
           </h4>
           {options.additiontext && (
-            <p className="text-primary text-sm line-clamp-1">
+            <p className="text-primary text-xs line-clamp-1">
               {options.additiontext}
             </p>
           )}

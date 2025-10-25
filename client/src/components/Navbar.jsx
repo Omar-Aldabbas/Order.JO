@@ -1,5 +1,7 @@
 import { User, User2 } from 'lucide-react'
-import Logo from '../assets/images/Logo.png'
+// import Logo from '../assets/images/Logo.png'
+import LOGO1 from '../assets/images/LOGO1.png'
+
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '../utils/cn'
 
@@ -15,12 +17,13 @@ export const Navbar = () => {
   ]
   return (
     <nav className="px-3 py-5 flex flex-row justify-around items-center">
-      <h1 className="font-bold text-6xl tracking-tighter relative ">
+      {/* <h1 className="font-bold text-6xl tracking-tighter relative ">
         Order{' '}
         <span className="tracking-tight -rotate-90 inline-block bg-primary text-lg px-1 -ml-2 min-w-[32px] -top-3 relative">
           .JO
         </span>
-      </h1>
+      </h1> */}
+      <img src={LOGO1} alt="logo" className='object-cover object-center'/>
 
       <ul className="text-md font-medium text-secondary flex-row hidden xl:flex justify-around min-w-[70%] items-center">
         {navItems.map(item => (

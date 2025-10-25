@@ -5,7 +5,8 @@ import { CategoryCard } from "./cards/categoryCard";
 export const CategoriesSection = () => {
   const [ref, isVisible] = useInView({ threshold: 0.3 })
   return (
-    <div>
+    // px-here cus we neeed to display a bg 
+    <div className='bg-mute lg:bg-white px-8 py-5'> 
       <h2 className='text-secondary font-semibold text-3xl p-5'>Order.JO's Popular categories</h2>
 
       <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4'>

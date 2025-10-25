@@ -1,6 +1,7 @@
 import { CategoriesSection } from '../components/CategoriesSection'
 import { Hero } from '../components/Hero'
 import { Navbar } from '../components/Navbar'
+import { OrdersRestaurantsSection } from '../components/OrderRestaurantsSection'
 import { RestaurantsSection } from '../components/RestaurantsSection'
 
 export const Home = () => {
@@ -10,8 +11,12 @@ export const Home = () => {
         <Navbar />
         <Hero />
         <RestaurantsSection />
-        <CategoriesSection/>
         <h1>Home page</h1>
+      </div>
+      <CategoriesSection />
+
+      <div className="px-8">
+        <OrdersRestaurantsSection/>
       </div>
     </>
   )

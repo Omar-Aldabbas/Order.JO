@@ -50,7 +50,7 @@ export const Login = () => {
         <div className="bg-background w-full min-h-[70vh] xl:min-h-screen flex flex-col justify-center items-center  xl:min-w-[50vw] rounded-4xl p-4">
           <form
             action={formik.handleSubmit}
-            className="flex flex-col justify-center items-center gap-4 w-full lg:min-w-[40vw] p-1"
+            className="flex flex-col justify-center items-center gap-4 w-full lg:max-w-[25vw] p-1"
           >
             {/* Email */}
             <div className="flex flex-col gap-2 w-full">

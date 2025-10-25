@@ -10,7 +10,7 @@ use App\Http\Controllers\API\RestaurantRatingController;
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Upgrade role (user can upgrade to courier or restaurant)
+    // Upgrade role { this for now in ui based in buttons one to become a courier and the other to become a restaurant | TODO: make a subscribtion form  reviewd and accepted by support to change roles } (user can upgrade to courier or restaurant)
     Route::post('/upgrade-role', [UserController::class, 'upgradeRole']);
 
     // User Routes
@@ -56,7 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/support/reservations/{reservation_id}/cancel', [SupportController::class, 'cancelReservation']);
     });
 
-    // Admin Routes
+    // Admin Routes {To do in ui make read option // will work like view }
     Route::middleware('role:admin')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
@@ -64,7 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/notifications', [NotificationController::class, 'clearAll']);
     });
 
-    // Ratings accessible by any user
+    // Ratings {only user can rate  and rateafter order/reservation finished }
     Route::middleware('role:user')->group(function () {
         Route::post('/ratings/{order_id}', [RestaurantRatingController::class, 'rate']);
     });

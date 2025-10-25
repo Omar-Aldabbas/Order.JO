@@ -35,7 +35,7 @@ export const Verification = () => {
           </p>
         </div>
         {/* BOTTOM */}
-        <div className="bg-background w-full min-h-[70vh] xl:min-h-screen flex flex-col items-center xl:min-w-[50vw] rounded-4xl px-4 py-8">
+        <div className="bg-background w-full min-h-[70vh] xl:min-h-screen flex flex-col lg:justify-center items-center xl:min-w-[50vw] rounded-4xl px-4 py-8">
           <form
             action={formik.handleSubmit}
             className="flex flex-col justify-center items-center gap-4 lg:max-w-[40vw] xl:max-w-[25vw] w-full p-1"

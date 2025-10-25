@@ -8,7 +8,7 @@ import SoupImg from "../assets/images/soup.png";
 
 export const CATEGORIES = [
   {
-    name: "Burger & Fast Food",
+    name: "Burger & FastFood",
     slug: "burger",
     img: BurgerImg,
     alt: "Burger & Fast Food",
