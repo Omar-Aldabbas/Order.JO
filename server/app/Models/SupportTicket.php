@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Reservation;
+use App\Models\RoleChangeRequest;
 
 class SupportTicket extends Model
 {
@@ -34,5 +35,10 @@ class SupportTicket extends Model
     public function reservation()
     {
         return $this->belongsTo(Reservation::class, 'related_id')->where('type', 'reservation');
+    }
+
+    public function roleChangeRequest()
+    {
+        return $this->belongsTo(RoleChangeRequest::class, 'related_id')->where('type', 'role_change');
     }
 }

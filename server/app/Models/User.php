@@ -18,7 +18,11 @@ class User extends Authenticatable
         'password',
         'profile_image',
         'latitude',
-        'longitude'
+        'longitude',
+        'phone',
+        'birth_date',
+        'address',
+        'avatar'
     ];
 
     protected $hidden = [
@@ -59,5 +63,20 @@ class User extends Authenticatable
     public function ratedRestaurants()
     {
         return $this->hasMany(RestaurantRating::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function roleChangeRequests()
+    {
+        return $this->hasMany(RoleChangeRequest::class, 'user_id');
+    }
+
+    public function handledRoleChangeRequests()
+    {
+        return $this->hasMany(RoleChangeRequest::class, 'handled_by');
     }
 }

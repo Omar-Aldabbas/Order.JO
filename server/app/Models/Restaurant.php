@@ -10,7 +10,22 @@ class Restaurant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'name', 'type', 'address', 'latitude', 'longitude', 'profile_image',  'service_type',
+        'user_id',
+        'name',
+        'type',
+        'address',
+        'latitude',
+        'longitude',
+        'profile_image',
+        'cover_image',
+        'phone',
+        'bio',
+        'service_type',
+        'operating_hours',
+    ];
+
+    protected $casts = [
+        'operating_hours' => 'array',
     ];
 
     public function owner()
@@ -31,5 +46,9 @@ class Restaurant extends Model
     public function reservations()
     {
         return $this->hasMany(Reservation::class);
+    }
+    public function ratings()
+    {
+        return $this->hasMany(RestaurantRating::class);
     }
 }

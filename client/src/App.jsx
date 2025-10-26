@@ -20,6 +20,8 @@ import { CookiesPolicy } from './pages/Cookies'
 import { ModernSlaveryStatement } from './pages/Statement'
 import { HelpPage } from './pages/Support'
 import { AwardsPromotions } from './pages/Awards'
+import { RegisterDriver } from './pages/user/RegisterDriver'
+import { RegisterOwner } from './pages/user/RegisterOwner'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,6 +36,8 @@ const router = createBrowserRouter(
       <Route path="terms" element={<Terms />} />
       <Route path="cookies" element={<CookiesPolicy />} />
       <Route path="statement" element={<ModernSlaveryStatement />} />
+      <Route path='register/rider' element={<RegisterDriver/>}/>
+      <Route path='register/owner' element={<RegisterOwner/>}/>
 
       {/* Mianlayout */}
       <Route element={<MainLayout />}>

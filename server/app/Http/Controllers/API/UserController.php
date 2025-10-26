@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Restaurant;
 use App\Models\MenuItem;
@@ -12,8 +14,8 @@ use App\Models\OrderItem;
 use App\Models\Reservation;
 use App\Models\Notification;
 use App\Models\RestaurantRating;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Models\CartItem;
+use App\Models\RoleChangeRequest;
 use App\Jobs\SendNotification;
 
 class UserController extends Controller
@@ -40,8 +42,11 @@ class UserController extends Controller
         $request->validate([
             'name' => 'sometimes|string|max:255',
             'profile_image' => 'sometimes|image|max:2048',
+            'avatar' => 'sometimes|image|max:2048',
             'latitude' => 'sometimes|numeric',
             'longitude' => 'sometimes|numeric',
+            'phone' => 'sometimes|string|max:255',
+            'birth_date' => 'sometimes|date',
         ]);
         if ($request->hasFile('profile_image')) {
             if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
@@ -49,7 +54,13 @@ class UserController extends Controller
             }
             $user->profile_image = $request->file('profile_image')->store('profile_images', 'public');
         }
-        $user->fill($request->only('name', 'latitude', 'longitude'))->save();
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
+        }
+        $user->fill($request->only('name', 'latitude', 'longitude', 'phone', 'birth_date'))->save();
         return response()->json($user);
     }
 
@@ -61,7 +72,8 @@ class UserController extends Controller
             'items' => 'required|array',
             'items.*.menu_item_id' => 'required|exists:menu_items,id',
             'items.*.menu_item_variant_id' => 'nullable|exists:menu_item_variants,id',
-            'items.*.quantity' => 'required|integer|min:1'
+            'items.*.quantity' => 'required|integer|min:1',
+            'note' => 'nullable|string|max:1000'
         ]);
         $total = 0;
         foreach ($request->items as $item) {
@@ -77,7 +89,8 @@ class UserController extends Controller
             'user_id' => $user->id,
             'restaurant_id' => $request->restaurant_id,
             'status' => 'pending',
-            'total_price' => $total
+            'total_price' => $total,
+            'note' => $request->note ?? null
         ]);
         foreach ($request->items as $item) {
             $menuItem = MenuItem::findOrFail($item['menu_item_id']);
@@ -187,9 +200,74 @@ class UserController extends Controller
         $request->validate([
             'role' => 'required|in:restaurant,courier'
         ]);
-
         $user = Auth::user();
         $user->syncRoles($request->role);
         return response()->json(['message' => "Your role has been updated to {$request->role}"]);
+    }
+
+    public function getCart()
+    {
+        $user = Auth::user();
+        $cartItems = CartItem::with(['menuItem', 'variant'])->where('user_id', $user->id)->get();
+        return response()->json($cartItems);
+    }
+
+    public function addToCart(Request $request)
+    {
+        $request->validate([
+            'menu_item_id' => 'required|exists:menu_items,id',
+            'menu_item_variant_id' => 'nullable|exists:menu_item_variants,id',
+            'quantity' => 'required|integer|min:1',
+            'price' => 'nullable|numeric'
+        ]);
+        $user = Auth::user();
+        $cartItem = CartItem::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'menu_item_id' => $request->menu_item_id,
+                'menu_item_variant_id' => $request->menu_item_variant_id,
+            ],
+            [
+                'quantity' => $request->quantity,
+                'price' => $request->price ?? null,
+            ]
+        );
+        return response()->json($cartItem);
+    }
+
+    public function updateCart(Request $request, $id)
+    {
+        $request->validate(['quantity' => 'required|integer|min:1']);
+        $cartItem = CartItem::findOrFail($id);
+        $cartItem->update(['quantity' => $request->quantity]);
+        return response()->json($cartItem);
+    }
+
+    public function removeCartItem($id)
+    {
+        $cartItem = CartItem::findOrFail($id);
+        $cartItem->delete();
+        return response()->json(['message' => 'Cart item removed']);
+    }
+
+    public function clearCart()
+    {
+        $user = Auth::user();
+        CartItem::where('user_id', $user->id)->delete();
+        return response()->json(['message' => 'Cart cleared']);
+    }
+
+    public function requestRoleChange(Request $request)
+    {
+        $request->validate(['requested_role' => 'required|string|in:restaurant,courier']);
+        $user = Auth::user();
+        $roleRequest = RoleChangeRequest::create([
+            'user_id' => $user->id,
+            'requested_role' => $request->requested_role,
+            'status' => 'pending',
+            'note' => $request->note ?? null,
+            'phone' => $user->phone ?? null
+        ]);
+        return response()->json($roleRequest);
     }
 }
