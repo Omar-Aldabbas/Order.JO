@@ -25,7 +25,7 @@ export const About = () => {
         "text-secondary space-y-16 leading-relaxed"
       )}
     >
-      <div className="w-full mb-6">
+      {/* <div className="w-full mb-6">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-foreground font-semibold hover:bg-order transition-all duration-300 shadow-sm"
@@ -33,7 +33,7 @@ export const About = () => {
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
-      </div>
+      </div> */}
 
       <div className="text-center space-y-3">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-secondary">

@@ -30,18 +30,17 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login />} />
       <Route path="forgot" element={<Forgot />} />
       <Route path="verify" element={<Verification />} />
-      <Route path="about" element={<About/>}/>
-      <Route path="privacy" element={<Privacy/>}/>
-      <Route path="terms" element={<Terms/>}/>
-      <Route path="cookies" element={<CookiesPolicy/>}/>
-      <Route path="statement" element={<ModernSlaveryStatement/>}/>
+      <Route path="privacy" element={<Privacy />} />
+      <Route path="terms" element={<Terms />} />
+      <Route path="cookies" element={<CookiesPolicy />} />
+      <Route path="statement" element={<ModernSlaveryStatement />} />
 
       {/* Mianlayout */}
       <Route element={<MainLayout />}>
+        <Route path="about" element={<About />} />
         <Route path="home" element={<Home />} />
-        <Route path="help" element={<HelpPage/>}/>
-        <Route path="awards" element={<AwardsPromotions/> }/>
-
+        <Route path="help" element={<HelpPage />} />
+        <Route path="awards" element={<AwardsPromotions />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Route>

@@ -20,7 +20,8 @@ export const Footer = () => {
   return (
     <footer className="bg-mute">
       <div
-        className={cn("py-14 px-8 mt-4",
+        className={cn(
+          'py-14 px-8 mt-4',
           isMobile
             ? 'flex flex-col justify-center'
             : 'grid grid-cols-3 justify-items-center items-baseline'
@@ -80,7 +81,7 @@ export const Footer = () => {
           <form action="" className="relative">
             <input
               type="email"
-              placeholder='johndoe@email.com'
+              placeholder="johndoe@email.com"
               className="px-5 py-4  focus:outline-primary shadow-inner text-secondary placeholder-gray-200 bg-gray-300 rounded-full w-full"
             />
             <button className="absolute right-0 py-4 px-7 bg-primary rounded-full text-foreground font-semibold ">
@@ -93,42 +94,18 @@ export const Footer = () => {
           <div className="flex flex-row flex-nowrap justify-center items-center gap-6 p-4">
             <Facebook
               size={50}
-              onClick={e => {
-                e.preventDefault
-                toast.info(
-                  "We're still working on this feature. Stay Tuned! 😊"
-                )
-              }}
               className="text-secondary hover:text-primary active:text-primary transition-colors duration-200 border rounded-xl p-2"
             />
             <Instagram
               size={50}
-              onClick={e => {
-                e.preventDefault
-                toast.info(
-                  "We're still working on this feature. Stay Tuned! 😊"
-                )
-              }}
               className="text-secondary hover:text-primary active:text-primary transition-colors duration-200 border rounded-xl p-2"
             />
             <Linkedin
               size={50}
-              onClick={e => {
-                e.preventDefault
-                toast.info(
-                  "We're still working on this feature. Stay Tuned! 😊"
-                )
-              }}
               className="text-secondary hover:text-primary active:text-primary transition-colors duration-200 border rounded-xl p-2"
             />
             <Cloud
               size={50}
-              onClick={e => {
-                e.preventDefault
-                toast.info(
-                  "We're still working on this feature. Stay Tuned! 😊"
-                )
-              }}
               className="text-secondary hover:text-primary active:text-primary transition-colors duration-200 border rounded-xl p-2"
             />
           </div>
