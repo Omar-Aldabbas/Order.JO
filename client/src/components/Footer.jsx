@@ -18,7 +18,7 @@ export const Footer = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
   return (
-    <footer className=" bg-mute">
+    <footer className="bg-mute">
       <div
         className={cn("py-14 px-8 mt-4",
           isMobile
@@ -46,7 +46,7 @@ export const Footer = () => {
               <img
                 src={Android}
                 alt="Googleplay link"
-                className={cn(isMobile ? 'w-32' : 'w-64 p-1')}
+                className={cn(isMobile ? 'w-50' : 'w-64 p-1')}
               />
             </a>
 
@@ -60,7 +60,7 @@ export const Footer = () => {
               <img
                 src={Apple}
                 alt="Apple store link"
-                className={cn(isMobile ? 'w-32' : 'w-64')}
+                className={cn(isMobile ? 'w-50' : 'w-64')}
               />
             </a>
           </div>
@@ -145,13 +145,13 @@ export const Footer = () => {
           <ul className="space-y-3 p-3">
             <li className="font-semibold text-lg">Legal Pages</li>
             <li>
-              <Link to="#" className="underline  capitalize">
+              <Link to="/terms" className="underline  capitalize">
                 terms & conditions
               </Link>
             </li>
             <li>
               <Link
-                to="#"
+                to="/privacy"
                 className="underline text-secondary hover:text-primary active:text-primary transition-colors duration-200 capitalize"
               >
                 privacy
@@ -159,7 +159,7 @@ export const Footer = () => {
             </li>
             <li>
               <Link
-                to="#"
+                to="/cookies"
                 className="underline text-secondary hover:text-primary active:text-primary transition-colors duration-200 capitalize"
               >
                 Cookeis
@@ -167,7 +167,7 @@ export const Footer = () => {
             </li>
             <li>
               <Link
-                to="#"
+                to="/statement"
                 className="underline text-secondary hover:text-primary active:text-primary transition-colors duration-200 capitalize"
               >
                 Modern Slavery Statement
@@ -179,7 +179,7 @@ export const Footer = () => {
             <li className="font-semibold text-lg">Important Links</li>
             <li>
               <Link
-                to="#"
+                to="/help"
                 className="underline text-secondary hover:text-primary active:text-primary transition-colors duration-200 capitalize"
               >
                 get help
@@ -187,7 +187,7 @@ export const Footer = () => {
             </li>
             <li>
               <Link
-                to="#"
+                to="register?type/retaurant"
                 className="underline text-secondary hover:text-primary active:text-primary transition-colors duration-200 capitalize"
               >
                 add yout restaurant
@@ -195,7 +195,7 @@ export const Footer = () => {
             </li>
             <li>
               <Link
-                to="#"
+                to="/register?type=rider"
                 className="underline text-secondary hover:text-primary active:text-primary transition-colors duration-200 capitalize"
               >
                 sign up as driver
@@ -203,7 +203,7 @@ export const Footer = () => {
             </li>
             <li>
               <Link
-                to="#"
+                to="/awards"
                 onClick={e => {
                   e.preventDefault
                   toast.info(
