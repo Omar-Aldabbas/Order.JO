@@ -18,7 +18,7 @@ export const GetAppSection = () => {
 
   return (
     <div className="py-5 flex w-full my-4">
-      <div className="bg-mute flex flex-col-reverse lg:grid lg:grid-cols-2 w-full gap-3 relative rounded-xl">
+      <div className="bg-mute flex flex-col-reverse lg:grid lg:grid-cols-2 w-full gap-3 relative rounded-xl pt-6">
         <div className="relative w-full">
           <img
             src={FriendsOrg}
@@ -28,7 +28,7 @@ export const GetAppSection = () => {
           <img
             src={Friends}
             alt="Shadow img"
-            className="absolute -top-5 -left-5 z-10 "
+            className="absolute -top-2 -left-2 lg:-top-5 lg:-left-5 z-10 "
           />
         </div>
 

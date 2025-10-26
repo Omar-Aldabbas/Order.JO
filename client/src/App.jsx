@@ -33,7 +33,7 @@ const router = createBrowserRouter(
 function App() {
   return (
     <>
-      <Toaster position='top-center'  richColors duration={3000}/>
+      <Toaster position='top-center' richColors duration={3000}/>
       <RouterProvider router={router}/>
     </>
   )

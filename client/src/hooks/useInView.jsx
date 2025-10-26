@@ -1,24 +1,29 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from 'react'
 
+export const useInView = (options = {}) => {
+  const ref = useRef(null)
+  const [isVisible, setIsVisible] = useState(false)
 
-export const useInView = (options={}) => {
- const ref = useRef(null);
- const [isVisible, setIsVisible] = useState(false)
+  const defaultOptions = { threshold: 0.3 }
+  const memOptions = useMemo(
+    () => ({ ...defaultOptions, ...options }),
+    [options]
+  )
 
- const memOptions = useMemo(()=> options, [JSON.stringify(options)])
- useEffect(()=> {
+  useEffect(() => {
     const observer = new IntersectionObserver(([entry], obs) => {
-        if(entry.isIntersecting) {
-            setIsVisible(prev => !prev);
-            obs.unobserve(entry.target);
-        }
+      if (entry.isIntersecting) {
+        setIsVisible(true)
+        obs.unobserve(entry.target)
+      }
     }, memOptions)
 
-    if(ref.current) observer.observe(ref.current);
+    if (ref.current) observer.observe(ref.current)
 
-    return () => {if(ref.current) observer.unobserve(ref.current)}
- }, [memOptions])
+    return () => {
+      if (ref.current) observer.unobserve(ref.current)
+    }
+  }, [memOptions])
 
-
- return [ref, isVisible]
+  return [ref, isVisible]
 }

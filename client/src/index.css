@@ -11,8 +11,8 @@
 
   --color-mute: var(--mute);
 
-  --animate-fade-in-left: fade-in-left 0.4s ease;
-  --animate-fade-inlright: fade-in-right 0.4s ease;
+  --animate-fade-in-left: fade-in-left 0.4s ease-in-out;
+  --animate-fade-in-right: fade-in-right 0.4s ease-in-out;
   --animate-spin: spin 0.4s ease;
 
   --animate-skeleton: skeleton 1s infinite;
@@ -28,22 +28,22 @@
 
   @keyframes fade-in-left {
     from {
-      opacity: 1;
+      opacity: 0;
       transform: translateX(20px);
     }
     to {
-      opacity: 0;
+      opacity: 1;
       transform: translateX(0);
     }
   }
 
   @keyframes fade-in-right {
     from {
-      opacity: 1;
+      opacity: 0;
       transform: translateX(-20px);
     }
     to {
-      opacity: 0;
+      opacity: 1;
       transform: trnaslateX(0);
     }
   }

@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
-
+import { useInView } from '../../hooks/useInView'
+import { cn } from '../../utils/cn'
 export const BannerCard = options => {
+  const [ref, isVisible] = useInView()
   return (
-    <div className="relative w-full h-full rounded-xl overflow-hidden group hover:shadow-md">
+    <div ref={ref} className={cn("relative w-full h-full rounded-xl overflow-hidden group hover:shadow-md", isVisible ? " animate-fade-in-left" : "opacity-0")}>
       <img
         src={options.img}
         alt={options.alt}
