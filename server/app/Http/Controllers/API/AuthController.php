@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
-
     public function register(Request $request)
     {
         $request->validate([
@@ -39,33 +41,30 @@ class AuthController extends Controller
         ]);
     }
 
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
 
+        $user = User::where('email', $request->email)->first();
 
-public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|string|email',
-        'password' => 'required|string',
-    ]);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
 
-    $user = User::where('email', $request->email)->first();
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-    if (!$user || !Hash::check($request->password, $user->password)) {
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+            'role' => $user->getRoleNames()->first()
         ]);
     }
-
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    return response()->json([
-        'access_token' => $token,
-        'token_type' => 'Bearer',
-        'user' => $user,
-        'role' => $user->getRoleNames()->first() 
-    ]);
-}
-
 
     public function logout(Request $request)
     {
@@ -76,36 +75,38 @@ public function login(Request $request)
         ]);
     }
 
-
-    public function updateProfile(Request $request)
+    public function forgotPassword(Request $request)
     {
-        $user = $request->user();
+        $request->validate(['email' => 'required|email']);
 
+        $status = Password::sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => 'Password reset link sent.'])
+            : response()->json(['message' => 'Unable to send reset link.'], 500);
+    }
+
+    public function resetPassword(Request $request)
+    {
         $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'avatar' => 'nullable|image|max:2048',
-            'address' => 'nullable|string|max:500',
-            'birth_date' => 'nullable|date',
+            'token' => 'required|string',
+            'email' => 'required|string|email',
+            'password' => 'required|string|confirmed|min:6',
         ]);
 
-        if ($request->has('name')) $user->name = $request->name;
-        if ($request->has('phone')) $user->phone = $request->phone;
-        if ($request->has('address')) $user->address = $request->address;
-        if ($request->has('birth_date')) $user->birth_date = $request->birth_date;
-
-        if ($request->hasFile('avatar')) {
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                Storage::disk('public')->delete($user->avatar);
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+                $user->save();
+                event(new PasswordReset($user));
             }
-            $user->avatar = $request->file('avatar')->store('avatars', 'public');
-        }
+        );
 
-        $user->save();
-
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => $user,
-        ]);
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['message' => 'Password has been reset successfully.'])
+            : response()->json(['message' => 'Failed to reset password.'], 500);
     }
 }

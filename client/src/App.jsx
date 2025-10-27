@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom'
 import { Splash } from './pages/Splash'
 import { NotFound } from './pages/NotFound'
-import { Register } from './pages/Auth'
+import { Register } from './pages/Register'
 import { Toaster } from 'sonner'
 import { Login } from './pages/Login'
 import { Forgot } from './pages/Forgot'

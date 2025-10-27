@@ -1,92 +1,48 @@
-import axios from "axios";
+import API from "./api"; 
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, 
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-
-export const register = async (data) => {
+export const registerUser = async (data) => {
   try {
-    const response = await api.post("/register", data);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
+    const res = await API.post("/register", data);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Registration failed" };
   }
 };
 
-export const login = async (data) => {
+export const loginUser = async (data) => {
   try {
-    const response = await api.post("/login", data);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
+    const res = await API.post("/login", data);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Login failed" };
   }
 };
 
-export const logout = async (token) => {
+export const logoutUser = async () => {
   try {
-    const response = await api.post(
-      "/logout",
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
+    const res = await API.post("/logout");
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Logout failed" };
   }
 };
 
-export const updateProfile = async (data, token) => {
-  try {
-    const formData = new FormData();
 
-    Object.keys(data).forEach((key) => {
-      if (data[key] !== undefined && data[key] !== null) {
-        formData.append(key, data[key]);
-      }
-    });
-
-    const response = await api.put("/profile", formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
-
-export const requestRoleChange = async (data, token) => {
-  try {
-    const response = await api.post("/request-role-change", data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
 
 export const forgotPassword = async (email) => {
   try {
-    const response = await api.post("/forgot-password", { email });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
+    const res = await API.post("/forgot-password", { email });
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Forgot password failed" };
   }
 };
 
 export const resetPassword = async (data) => {
   try {
-    const response = await api.post("/reset-password", data);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
+    const res = await API.post("/reset-password", data);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Reset password failed" };
   }
 };

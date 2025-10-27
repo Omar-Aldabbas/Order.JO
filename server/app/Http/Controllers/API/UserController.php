@@ -19,16 +19,34 @@ use App\Jobs\SendNotification;
 
 class UserController extends Controller
 {
+    public function getProfile(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'user' => $user,
+            'role' => $user->getRoleNames()->first(),
+        ]);
+    }
+
+
+
     public function updateProfile(Request $request)
     {
-        $user = Auth::user();
+        $user = $request->user();
+
         $request->validate([
             'name' => 'sometimes|string|max:255',
-            'avatar' => 'sometimes|image|max:2048',
-            'phone' => 'sometimes|string|max:255',
-            'address' => 'sometimes|string|max:255',
-            'birth_date' => 'sometimes|date',
+            'phone' => 'nullable|string|max:20',
+            'avatar' => 'nullable|image|max:2048',
+            'address' => 'nullable|string|max:500',
+            'birth_date' => 'nullable|date',
         ]);
+
+        if ($request->has('name')) $user->name = $request->name;
+        if ($request->has('phone')) $user->phone = $request->phone;
+        if ($request->has('address')) $user->address = $request->address;
+        if ($request->has('birth_date')) $user->birth_date = $request->birth_date;
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
@@ -37,8 +55,12 @@ class UserController extends Controller
             $user->avatar = $request->file('avatar')->store('avatars', 'public');
         }
 
-        $user->fill($request->only('name', 'phone', 'address', 'birth_date'))->save();
-        return response()->json($user);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user,
+        ]);
     }
 
     public function getRestaurants(Request $request)

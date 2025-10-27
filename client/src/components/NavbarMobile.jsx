@@ -24,7 +24,7 @@ export const NavbarMobile = () => {
   const toggleMenu = () => setIsOpen(prev => !prev)
 
   return (
-    <nav className="sticky top-0 left-0 z-50 backdrop-blur-2xl flex justify-between items-center px-5 py-6 xl:hidden bg-background/50">
+    <nav className="sticky top-0 left-0 z-50 backdrop-blur-2xl flex justify-between items-center px-5 py-4 xl:hidden bg-background/50">
       <h1 className="font-bold text-4xl relative tracking-tighter">
         Order{' '}
         <span className="inline-block -rotate-90 bg-primary text-sm px-1 -ml-2 min-w-8 -top-3 relative">
@@ -48,7 +48,7 @@ export const NavbarMobile = () => {
               to={item.path}
               onClick={toggleMenu}
               className={cn(
-                'text-secondary text-2xl py-3 px-7 transition-all duration-200',
+                'text-secondary text-2xl py-3 px-7 transition-all duration-200 rounded-full ',
                 location.pathname === item.path
                   ? 'rounded-full bg-primary text-foreground'
                   : 'hover:bg-primary hover:text-foreground'

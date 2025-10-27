@@ -13,11 +13,14 @@ use App\Http\Controllers\API\CartController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
     // User 
+    Route::get('/profile', [UserController::class, 'getProfile']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
 
     Route::post('/role-change-request', [UserController::class, 'requestRoleChange']);

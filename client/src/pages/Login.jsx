@@ -1,30 +1,45 @@
-import { toast } from 'sonner'
 import { useFormik } from 'formik'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { FaApple, FaFacebookF, FaTwitter } from 'react-icons/fa'
-import { Eye, EyeOff, TwitterIcon, XIcon } from 'lucide-react'
+import { FaApple, FaFacebookF } from 'react-icons/fa'
+import { Eye, EyeOff, TwitterIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import { loginValidate } from '../helper/validate'
+import { useAuthStore } from '../store/authStore'
+import { useAutoRedirectIfAuth } from '../utils/redirectByRole'
 
 export const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
-  // this register
+  const navigate = useNavigate()
+  const { login, error } = useAuthStore()
+
+  useAutoRedirectIfAuth(navigate)
+
   const formik = useFormik({
     initialValues: {
-      email: 'omar@test.com',
-      password: 'QWEr123$',
+      email: '',
+      password: '',
       remember: false,
     },
     validate: loginValidate,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async values => {
-      console.log(values)
-
       if (values.remember) {
         localStorage.setItem('rememberEmail', values.email)
       } else {
         localStorage.removeItem('rememberEmail')
+      }
+
+      const toastId = toast.loading('Logging in...')
+      try {
+        await login({
+          email: values.email,
+          password: values.password,
+        })
+        toast.success('Login successful!', { id: toastId })
+      } catch {
+        toast.error(error || 'Login failed', { id: toastId })
       }
     },
   })
@@ -46,10 +61,11 @@ export const Login = () => {
             Please sign in to your existing account
           </p>
         </div>
+
         {/* BOTTOM */}
         <div className="bg-background w-full min-h-[70vh] xl:min-h-screen flex flex-col justify-center items-center  xl:min-w-[50vw] rounded-4xl p-4">
           <form
-            action={formik.handleSubmit}
+            onSubmit={formik.handleSubmit}
             className="flex flex-col justify-center items-center gap-4 w-full lg:max-w-[25vw] p-1"
           >
             {/* Email */}
@@ -70,7 +86,6 @@ export const Login = () => {
               />
             </div>
 
-            {/* Password */}
             <div className="flex flex-col gap-2 w-full relative">
               <label
                 htmlFor="password"
@@ -94,6 +109,7 @@ export const Login = () => {
                 {showPassword ? <Eye /> : <EyeOff />}
               </button>
             </div>
+
             <div className="flex flex-row justify-between items-center w-full p-1">
               <div className="flex items-center gap-2">
                 <input
@@ -109,7 +125,6 @@ export const Login = () => {
                   Remember Me
                 </label>
               </div>
-
               <Link
                 to="/forgot"
                 className="text-xs text-secondary hover:text-primary active:text-primary capitalize"
@@ -117,17 +132,19 @@ export const Login = () => {
                 Forgot Password?
               </Link>
             </div>
-            {/* button */}
+
             <button
               type="submit"
               className="uppercase w-full lg:max-w-[50vw] bg-primary  text-foreground p-4 text-center rounded-lg hover:bg-secondary active:bg-secondary active:outline-primary active:outline-2 transition-colors duration-400"
             >
-              log in 
+              log in
             </button>
           </form>
+
+          {/* OAuth Section */}
           <div className="flex flex-col justify-center items-center gap-2 mt-4">
             <span className="text-sm text-gray-600 text-center mt-1">
-              Don't have an account? {'   '}{' '}
+              Don't have an account?{' '}
               <Link
                 to="/register"
                 className="text-secondary hover:text-primary active:text-primary uppercase"

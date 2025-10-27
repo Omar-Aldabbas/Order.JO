@@ -1,26 +1,54 @@
-import { toast } from 'sonner'
 import { useFormik } from 'formik'
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { signupValidate } from '../helper/validate'
+import { useAuthStore } from '../store/authStore'
+import { toast } from 'sonner'
+import { redirectByRole } from '../utils/redirectByRole'
 
 export const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
-  // this register
+  const navigate = useNavigate()
+  const { register, user, role, loading, error, token } = useAuthStore()
+
+  useEffect(() => {
+    if (token && role) {
+      redirectByRole(role, navigate)
+    }
+  }, [token, role, navigate])
+
   const formik = useFormik({
     initialValues: {
-      fullname: 'Omar Admin',
-      email: 'omar@test.com',
-      password: 'QWEr123$',
-      passwordConfirm: 'QWEr123$',
+      fullname: '',
+      email: '',
+      password: '',
+      passwordConfirm: '',
     },
     validate: signupValidate,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async values => {
-      console.log(values)
+      const payload = {
+        name: values.fullname,
+        email: values.email,
+        password: values.password,
+        password_confirmation: values.passwordConfirm,
+      }
+
+      const toastId = toast.loading('Registering...')
+      try {
+        const data = await register(payload)
+        toast.success('Registration successful!', { id: toastId })
+
+        const userRole = role || 'user'
+        redirectByRole(userRole, navigate)
+
+        redirectByRole(data.role || data.user?.role, navigate)
+      } catch {
+        toast.error(error || 'Check your provided informations', { id: toastId })
+      }
     },
   })
 
@@ -28,25 +56,28 @@ export const Register = () => {
     e.preventDefault()
     setShowPassword(prev => !prev)
   }
+
   const togglePasswordConfirm = e => {
     e.preventDefault()
     setShowPasswordConfirm(prev => !prev)
   }
+
   return (
     <div className="container min-h-screen flex justify-center itmes-center flex-col min-w-screen">
       <div className="flex flex-col justify-center items-center overflow-hidden bg-secondary xl:flex-row">
-        {/* TOP */}
         <div className=" text-foreground text-center flex flex-col items-center justify-center  min-h-[30vh] xl:min-w-[30vw]">
-          <h2 className="capitalize font-semibold text-2xl tracking-widest">sign up</h2>
-          <p className="text-foreground/60 mt-4 text-sm">Please sign up to get started</p>
+          <h2 className="capitalize font-semibold text-2xl tracking-widest">
+            sign up
+          </h2>
+          <p className="text-foreground/60 mt-4 text-sm">
+            Please sign up to get started
+          </p>
         </div>
-        {/* BOTTOM */}
         <div className="bg-background w-full min-h-[70vh] xl:min-h-screen flex flex-col justify-center items-center xl:min-w-[50vw] rounded-4xl p-4">
           <form
-            action={formik.handleSubmit}
+            onSubmit={formik.handleSubmit}
             className="flex flex-col justify-center items-center gap-4 lg:max-w-[25vw] w-full p-1"
           >
-            {/* fullname */}
             <div className="flex flex-col gap-2 w-full">
               <label
                 htmlFor="fullname"
@@ -64,7 +95,6 @@ export const Register = () => {
               />
             </div>
 
-            {/* Email */}
             <div className="flex flex-col gap-2 w-full">
               <label
                 htmlFor="email"
@@ -82,7 +112,6 @@ export const Register = () => {
               />
             </div>
 
-            {/* Password */}
             <div className="flex flex-col gap-2 w-full relative">
               <label
                 htmlFor="password"
@@ -107,7 +136,6 @@ export const Register = () => {
               </button>
             </div>
 
-            {/* passwordConfirm */}
             <div className="flex flex-col gap-2 w-full relative">
               <label
                 htmlFor="passwordConfirm"
@@ -132,16 +160,16 @@ export const Register = () => {
               </button>
             </div>
 
-            {/* button */}
             <button
               type="submit"
+              disabled={loading}
               className="uppercase w-full lg:max-w-[50vw] bg-primary  text-foreground p-4 text-center rounded-lg hover:bg-secondary active:bg-secondary active:outline-primary active:outline-2 transition-colors duration-400"
             >
-              sign up
+              {loading ? 'Loading...' : 'sign up'}
             </button>
           </form>
           <span className="text-sm text-gray-600 text-center mt-1">
-            Already registered? {'   '}{' '}
+            Already registered? {'   '}
             <Link
               to="/login"
               className="text-secondary hover:text-primary active:text-primary uppercase"
