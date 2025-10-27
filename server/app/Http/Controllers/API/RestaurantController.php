@@ -9,6 +9,7 @@ use App\Models\Reservation;
 use App\Models\MenuItem;
 use App\Models\MenuItemVariant;
 use App\Models\Notification;
+use App\Models\RestaurantRating;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\SendNotification;
@@ -35,15 +36,22 @@ class RestaurantController extends Controller
         $orders = $ordersQuery->paginate($request->get('per_page', 15));
         $reservations = $reservationsQuery->paginate($request->get('per_page', 15));
 
+        $ratingStats = RestaurantRating::where('restaurant_id', $restaurant->id)
+            ->selectRaw('AVG(rating) as average_rating, COUNT(*) as total_reviews')
+            ->first();
+
         return response()->json([
             'orders' => $orders,
-            'reservations' => $reservations
+            'reservations' => $reservations,
+            'average_rating' => $ratingStats->average_rating ?? 0,
+            'total_reviews' => $ratingStats->total_reviews ?? 0
         ]);
     }
 
     public function updateOrderStatus(Request $request, $order_id)
     {
         $restaurant = Auth::user()->restaurant;
+
         $request->validate([
             'status' => 'required|string',
             'note' => 'nullable|string|max:1000'

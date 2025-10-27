@@ -41,18 +41,21 @@ class RestaurantRatingController extends Controller
 
     public function getRestaurantRatings(Request $request, $restaurant_id)
     {
-        $query = RestaurantRating::where('restaurant_id', $restaurant_id)->with('user')->orderBy('created_at', 'desc');
+        $query = RestaurantRating::where('restaurant_id', $restaurant_id)->with('user')->latest();
 
         if ($request->filled('min_rating')) $query->where('rating', '>=', $request->min_rating);
         if ($request->filled('max_rating')) $query->where('rating', '<=', $request->max_rating);
         if ($request->filled('from_date')) $query->whereDate('created_at', '>=', $request->from_date);
         if ($request->filled('to_date')) $query->whereDate('created_at', '<=', $request->to_date);
 
-        $ratings = $query->paginate(10);
-        $average = $ratings->avg('rating');
+        $ratings = $query->paginate($request->get('per_page', 10));
+
+        $averageRating = RestaurantRating::where('restaurant_id', $restaurant_id)
+            ->avg('rating');
 
         return response()->json([
-            'average_rating' => round($average, 1),
+            'average_rating' => round($averageRating, 1),
+            'total_reviews' => $ratings->total(),
             'ratings' => $ratings
         ]);
     }
