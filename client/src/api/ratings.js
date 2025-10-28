@@ -1,19 +1,19 @@
-import axios from 'axios';
+import API from "./api"; 
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
-  headers: { 'Content-Type': 'application/json' },
-});
+export const rateOrder = async (order_id, data) => {
+  try {
+    const res = await API.post(`/ratings/${order_id}`, data);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Failed to rate order" };
+  }
+};
 
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-export const rateOrder = (order_id, data) => api.post(`/ratings/${order_id}`, data);
-
-export const getRestaurantRatings = (restaurant_id, params = {}) =>
-  api.get(`/ratings/restaurant/${restaurant_id}`, { params });
-
-export default api;
+export const getRestaurantRatings = async (restaurant_id, params = {}) => {
+  try {
+    const res = await API.get(`/ratings/restaurant/${restaurant_id}`, { params });
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Failed to fetch restaurant ratings" };
+  }
+};

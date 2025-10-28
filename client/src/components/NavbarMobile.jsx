@@ -3,6 +3,7 @@ import { cn } from '../utils/cn'
 import { useState, useEffect } from 'react'
 import { Menu, User2 } from 'lucide-react'
 import { CgClose } from 'react-icons/cg'
+import { AuthButton } from './AuthButton'
 
 export const NavbarMobile = () => {
   const location = useLocation()
@@ -11,7 +12,7 @@ export const NavbarMobile = () => {
   const navItems = [
     { name: 'Home', path: '/home' },
     { name: 'Browse Menu', path: '/menu' },
-    { name: 'Special Offers', path: '/Special Offers' },
+    { name: 'Cart', path: '/cart' },
     { name: 'Restaurants', path: '/restaurants' },
     { name: 'Orders', path: '/orders' },
   ]
@@ -71,17 +72,7 @@ export const NavbarMobile = () => {
             About
           </Link>
 
-          <Link
-            to="/login"
-            className="bg-secondary hover:bg-mute hover:shadow-inner active:bg-mute active:shadow-inner rounded-full flex items-center gap-2 py-3 px-7 transition-all duration-200"
-          >
-            <User2
-              size={25}
-              fill="currentColor"
-              className="p-1 rounded-full text-secondary bg-primary"
-            />
-            <span className="text-foreground">Login/Signup</span>
-          </Link>
+            <AuthButton onClick={toggleMenu}/>
         </div>
       )}
     </nav>

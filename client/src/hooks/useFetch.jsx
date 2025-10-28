@@ -1,70 +1,40 @@
-import { useState, useEffect } from "react";
-import { API } from "../api/api";
+import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
-export const useFetch = (query, method = "get", payload = null, deps = [], options = { toastSuccess: false, toastError: true }) => {
+export const useFetch = (
+  apiFunction,
+  payload = null,
+  options = { toastSuccess: false, toastError: true, auto: true },
+  deps = []  
+) => {
   const [state, setState] = useState({
     isLoading: false,
     data: null,
-    status: null,
     error: null,
   });
 
-  useEffect(() => {
-    if (!query) return;
-
-    const fetchData = async () => {
-      setState((prev) => ({ ...prev, isLoading: true }));
-
+  const fetchData = useCallback(
+    async (overridePayload = null) => {
+      setState({ isLoading: true, data: null, error: null });
       try {
-        let response;
+        const result = await apiFunction(overridePayload ?? payload);
 
-        switch (method.toLowerCase()) {
-          case "get":
-            response = await API.get(query);
-            break;
-          case "post":
-            response = await API.post(query, payload);
-            break;
-          case "put":
-            response = await API.put(query, payload);
-            break;
-          case "delete":
-            response = await API.delete(query);
-            break;
-          default:
-            throw new Error("Invalid method");
-        }
-
-        if (options.toastSuccess) {
-          toast.success("Request successful!");
-        }
-
-        setState({
-          isLoading: false,
-          data: response.data,
-          status: response.status,
-          error: null,
-        });
-      } catch (error) {
-        const message =
-          error.response?.data?.message || error.message || "Something went wrong";
-
-        if (options.toastError) {
-          toast.error(message);
-        }
-
-        setState({
-          isLoading: false,
-          data: null,
-          status: error.response?.status || 500,
-          error: message,
-        });
+        if (options.toastSuccess) toast.success("Request successful!");
+        setState({ isLoading: false, data: result, error: null });
+        return result;
+      } catch (err) {
+        const message = err?.message || "Something went wrong";
+        if (options.toastError) toast.error(message);
+        setState({ isLoading: false, data: null, error: message });
       }
-    };
+    },
+    [apiFunction, payload, options.toastError, options.toastSuccess]
+  );
 
-    fetchData();
-  }, deps);
+  // 👇 auto-fetch logic
+  useEffect(() => {
+    if (options.auto) fetchData();
+  }, [fetchData, ...deps]); 
 
-  return [state, setState];
+  return [state, fetchData];
 };

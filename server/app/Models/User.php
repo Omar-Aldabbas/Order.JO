@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, HasApiTokens, HasRoles;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -22,7 +21,8 @@ class User extends Authenticatable
         'phone',
         'birth_date',
         'address',
-        'avatar'
+        'avatar',
+        'role',
     ];
 
     protected $hidden = [
@@ -78,5 +78,20 @@ class User extends Authenticatable
     public function handledRoleChangeRequests()
     {
         return $this->hasMany(RoleChangeRequest::class, 'handled_by');
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

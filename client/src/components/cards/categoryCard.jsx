@@ -1,11 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
 
 export const CategoryCard = ({ options }) => {
   return (
-    <Link 
-      to={`/restaurants?category=${encodeURIComponent(options.name)}`} 
-      className="block"
-    >
+    <Link to={options.link} className="block">
       <div className="rounded-lg w-full group cursor-pointer bg-background hover:shadow-md transition-shadow lg:bg-[#f5f5f5]">
         <div className="h-50 w-full overflow-hidden rounded-xl">
           <img
@@ -27,5 +24,5 @@ export const CategoryCard = ({ options }) => {
         </div>
       </div>
     </Link>
-  );
-};
+  )
+}

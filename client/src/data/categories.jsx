@@ -5,7 +5,6 @@ import PizzaImg from "../assets/images/pizza.png";
 import BreakfastImg from "../assets/images/breakfast.png";
 import SoupImg from "../assets/images/soup.png";
 
-
 export const CATEGORIES = [
   {
     name: "Burger & FastFood",
@@ -13,6 +12,7 @@ export const CATEGORIES = [
     img: BurgerImg,
     alt: "Burger & Fast Food",
     additiontext: "Hot & Tasty",
+    link: "/menu?type=burger",
   },
   {
     name: "Salads",
@@ -20,6 +20,7 @@ export const CATEGORIES = [
     img: SaladImg,
     alt: "Fresh Salads",
     additiontext: "Healthy & Fresh",
+    link: "/menu?type=salad",
   },
   {
     name: "Pasta & Casuals",
@@ -27,6 +28,7 @@ export const CATEGORIES = [
     img: PastaImg,
     alt: "Pasta & Casuals",
     additiontext: "Italian Favorites",
+    link: "/menu?type=other",
   },
   {
     name: "Pizza",
@@ -34,6 +36,7 @@ export const CATEGORIES = [
     img: PizzaImg,
     alt: "Pizza",
     additiontext: "Cheesy & Hot",
+    link: "/menu?type=pizza",
   },
   {
     name: "Breakfast",
@@ -41,6 +44,7 @@ export const CATEGORIES = [
     img: BreakfastImg,
     alt: "Breakfast",
     additiontext: "Start Your Day",
+    link: "/menu?type=breakfast",
   },
   {
     name: "Soup",
@@ -48,5 +52,6 @@ export const CATEGORIES = [
     img: SoupImg,
     alt: "Soup",
     additiontext: "Warm & Cozy",
+    link: "/menu?type=soup",
   },
 ];

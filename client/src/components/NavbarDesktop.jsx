@@ -4,6 +4,7 @@ import { User, User2 } from 'lucide-react'
 import LOGO1 from '../assets/images/LOGO1.png'
 
 import { cn } from '../utils/cn'
+import { AuthButton } from './AuthButton'
 
 export const NavbarDesktop = () => {
   const location = useLocation()
@@ -11,9 +12,9 @@ export const NavbarDesktop = () => {
   const navItems = [
     { name: 'Home', path: '/home' },
     { name: 'Browse Menu', path: '/menu' },
-    { name: 'Special Offers', path: '/Special Offers' },
     { name: 'Restaurants', path: '/restaurants' },
     { name: 'Track Order', path: '/orders' },
+    { name: 'Cart', path: '/cart' },
   ]
   return (
     <nav className="hidden sticky top-0 left-0 z-50 bg-foreground/30 backdrop-blur-2xl px-3 py-5 xl:flex flex-row justify-around items-center">
@@ -43,17 +44,8 @@ export const NavbarDesktop = () => {
           </li>
         ))}
         <li>
-          <Link
-            to="/login"
-            className="bg-secondary hover:bg-mute hover:shadow-inner active:bg-mute active:shadow-inner rounded-full flex flex-row items-center justify-center gap-2 py-3 px-7 transition-all duration-400"
-          >
-            <User2
-              size={25}
-              fill="currentColor"
-              className="p-1 rounded-full text-secondary bg-primary"
-            />
-            <span className="inline-block text-foreground">Login/Signup</span>
-          </Link>
+
+        <AuthButton/>
         </li>
       </ul>
     </nav>

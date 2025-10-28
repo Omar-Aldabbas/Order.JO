@@ -1,23 +1,19 @@
 import { useFormik } from 'formik'
 import { Link, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { signupValidate } from '../helper/validate'
 import { useAuthStore } from '../store/authStore'
 import { toast } from 'sonner'
-import { redirectByRole } from '../utils/redirectByRole'
+import { useAutoRedirectIfAuth } from '../utils/redirectByRole'
 
 export const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
   const navigate = useNavigate()
-  const { register, user, role, loading, error, token } = useAuthStore()
+  const { register, loading, error } = useAuthStore()
 
-  useEffect(() => {
-    if (token && role) {
-      redirectByRole(role, navigate)
-    }
-  }, [token, role, navigate])
+  useAutoRedirectIfAuth(navigate)
 
   const formik = useFormik({
     initialValues: {
@@ -39,15 +35,11 @@ export const Register = () => {
 
       const toastId = toast.loading('Registering...')
       try {
-        const data = await register(payload)
+        await register(payload)
         toast.success('Registration successful!', { id: toastId })
-
-        const userRole = role || 'user'
-        redirectByRole(userRole, navigate)
-
-        redirectByRole(data.role || data.user?.role, navigate)
+        navigate('/home')
       } catch {
-        toast.error(error || 'Check your provided informations', { id: toastId })
+        toast.error(Response.message || 'Check your provided information', { id: toastId })
       }
     },
   })
@@ -169,7 +161,7 @@ export const Register = () => {
             </button>
           </form>
           <span className="text-sm text-gray-600 text-center mt-1">
-            Already registered? {'   '}
+            Already registered?{' '}
             <Link
               to="/login"
               className="text-secondary hover:text-primary active:text-primary uppercase"

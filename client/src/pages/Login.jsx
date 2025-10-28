@@ -33,13 +33,29 @@ export const Login = () => {
 
       const toastId = toast.loading('Logging in...')
       try {
-        await login({
+        const userData = await login({
           email: values.email,
           password: values.password,
         })
+
         toast.success('Login successful!', { id: toastId })
-      } catch {
-        toast.error(error || 'Login failed', { id: toastId })
+
+        const role = localStorage.getItem('role') || userData?.role
+        if (role === 'restaurant') {
+          navigate('/myrestaurant')
+        } else {
+          navigate('/home')
+        }
+      } catch (err) {
+        if (err.response) {
+          const status = err.response.status
+          const message = err.response.data?.message || err.response.statusText
+          toast.error(`Error ${status}: ${message}`, { id: toastId })
+        } else {
+          toast.error(`Login failed: ${err.message || 'Unknown error'}`, {
+            id: toastId,
+          })
+        }
       }
     },
   })
@@ -158,17 +174,23 @@ export const Login = () => {
             <div className="flex justify-center items-center gap-6">
               <FaApple
                 size={70}
-                onClick={() => toast("Oauth not implemented yet. Maybe later 😘👍")}
+                onClick={() =>
+                  toast('Oauth not implemented yet. Maybe later 😘👍')
+                }
                 className="p-6 text-white rounded-full bg-black hover:bg-primary active:bg-primary transition-colors duration-300 cursor-pointer"
               />
               <FaFacebookF
                 size={70}
-                onClick={() => toast("Oauth not implemented yet. Maybe later 😘👍")}
+                onClick={() =>
+                  toast('Oauth not implemented yet. Maybe later 😘👍')
+                }
                 className="p-6 text-white rounded-full bg-[#1877F2] hover:bg-primary active:bg-primary transition-colors duration-300 cursor-pointer"
               />
               <TwitterIcon
                 size={70}
-                onClick={() => toast("Oauth not implemented yet. Maybe later 😘👍")}
+                onClick={() =>
+                  toast('Oauth not implemented yet. Maybe later 😘👍')
+                }
                 className="p-6 text-white rounded-full bg-[#569fff] hover:bg-primary active:bg-primary transition-colors duration-300 cursor-pointer"
               />
             </div>

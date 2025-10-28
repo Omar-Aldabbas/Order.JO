@@ -32,7 +32,7 @@ class CourierController extends Controller
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
-    public function acceptOrder($order_id)
+        public function acceptOrder($order_id)
     {
         $courier = Auth::user();
         $order = Order::where('id', $order_id)->whereNull('courier_id')->firstOrFail();
@@ -41,7 +41,7 @@ class CourierController extends Controller
             'status' => 'picked_up'
         ]);
 
-        SendNotification::dispatch($order, 'user', 'Your order has been picked up');
+        event(new OrderStatusUpdated($order, 'Your order has been picked up'));
 
         return response()->json($order->load('user', 'restaurant'));
     }
@@ -52,7 +52,7 @@ class CourierController extends Controller
         $order = Order::where('courier_id', $courier->id)->findOrFail($order_id);
         $order->update(['status' => 'delivered']);
 
-        SendNotification::dispatch($order, 'user', 'Your order has been delivered');
+        event(new OrderStatusUpdated($order, 'Your order has been delivered'));
 
         return response()->json(['message' => 'Delivery completed', 'order' => $order]);
     }

@@ -62,10 +62,15 @@ class RestaurantController extends Controller
         if ($request->filled('note')) $order->note = $request->note;
         $order->save();
 
-        SendNotification::dispatch($order, 'user', "Your order is now {$order->status}");
+        event(new \App\Events\OrderStatusUpdated($order, "Your order is now {$order->status}"));
+
+        if ($request->status === 'ready') {
+            event(new \App\Events\NewOrderAvailable($order));
+        }
 
         return response()->json($order);
     }
+
 
     public function addMenuItem(Request $request)
     {

@@ -22,6 +22,16 @@ import { HelpPage } from './pages/Support'
 import { AwardsPromotions } from './pages/Awards'
 import { RegisterDriver } from './pages/user/RegisterDriver'
 import { RegisterOwner } from './pages/user/RegisterOwner'
+import { Menu } from './pages/Menu'
+import { UserProfile } from './pages/user/UserProfile'
+import { RestaurantPage } from './pages/RestaurantPage'
+import { CartPage } from './pages/CartPage'
+
+import { NotificationsProvider } from './NotificationsProvider'
+import { DebugBroadcast } from './components/DebugBroadcast'
+import { RestaurantsPage } from './pages/RestaurantsPage'
+import { OrdersPage } from './pages/OrdersPage'
+import { MyRestaurant } from './pages/owner/MyRestaurant'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -36,8 +46,8 @@ const router = createBrowserRouter(
       <Route path="terms" element={<Terms />} />
       <Route path="cookies" element={<CookiesPolicy />} />
       <Route path="statement" element={<ModernSlaveryStatement />} />
-      <Route path='register/rider' element={<RegisterDriver/>}/>
-      <Route path='register/owner' element={<RegisterOwner/>}/>
+      <Route path="register/rider" element={<RegisterDriver />} />
+      <Route path="register/owner" element={<RegisterOwner />} />
 
       {/* Mianlayout */}
       <Route element={<MainLayout />}>
@@ -45,6 +55,13 @@ const router = createBrowserRouter(
         <Route path="home" element={<Home />} />
         <Route path="help" element={<HelpPage />} />
         <Route path="awards" element={<AwardsPromotions />} />
+        <Route path="menu" element={<Menu />} />
+        <Route path="profile" element={<UserProfile />} />
+        <Route path="restaurant/:id" element={<RestaurantPage />} />
+        <Route path="cart" element={<CartPage />} />
+        <Route path="restaurants" element={<RestaurantsPage />} />
+        <Route path="orders" element={<OrdersPage />} />
+        <Route path="myrestaurant" element={<MyRestaurant />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Route>
@@ -54,8 +71,11 @@ const router = createBrowserRouter(
 function App() {
   return (
     <>
-      <Toaster position="top-center" richColors duration={3000} />
-      <RouterProvider router={router} />
+      <DebugBroadcast />
+      <NotificationsProvider>
+        <Toaster position="top-center" richColors duration={3000} />
+        <RouterProvider router={router} />
+      </NotificationsProvider>
     </>
   )
 }

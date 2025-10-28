@@ -14,6 +14,7 @@ export const useAuthStore = create((set) => ({
     try {
       const data = await loginUser(credentials);
       localStorage.setItem("auth_token", data.access_token);
+      localStorage.setItem("role",data.role)
       set({
         user: data.user,
         role: data.role || data.user?.role || null,
@@ -42,7 +43,7 @@ export const useAuthStore = create((set) => ({
       });
       return data;
     } catch (err) {
-      set({ error: err.message || "Registration failed", loading: false });
+      set({ error: err.message || "Registration failed S", loading: false });
       throw err;
     }
   },
@@ -52,6 +53,7 @@ export const useAuthStore = create((set) => ({
       await logoutUser();
     } catch {}
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("role");
     set({ user: null, role: null, token: null, isAuth: false, loading: false });
   },
 

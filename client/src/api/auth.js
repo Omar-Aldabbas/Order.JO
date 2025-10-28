@@ -1,48 +1,28 @@
-import API from "./api"; 
+import API from './api';
 
 export const registerUser = async (data) => {
-  try {
-    const res = await API.post("/register", data);
-    return res.data;
-  } catch (err) {
-    throw err.response?.data || { message: "Registration failed" };
-  }
+  const res = await API.post('/register', data);
+  return res.data;
 };
 
 export const loginUser = async (data) => {
-  try {
-    const res = await API.post("/login", data);
-    return res.data;
-  } catch (err) {
-    throw err.response?.data || { message: "Login failed" };
-  }
+  const res = await API.post('/login', data);
+  return res.data;
 };
 
 export const logoutUser = async () => {
-  try {
-    const res = await API.post("/logout");
-    return res.data;
-  } catch (err) {
-    throw err.response?.data || { message: "Logout failed" };
-  }
+  const res = await API.post('/logout');
+  return res.data;
 };
 
-
-
 export const forgotPassword = async (email) => {
-  try {
-    const res = await API.post("/forgot-password", { email });
-    return res.data;
-  } catch (err) {
-    throw err.response?.data || { message: "Forgot password failed" };
-  }
+  const res = await API.post('/forgot-password', { email });
+  return res.data;
 };
 
 export const resetPassword = async (data) => {
-  try {
-    const res = await API.post("/reset-password", data);
-    return res.data;
-  } catch (err) {
-    throw err.response?.data || { message: "Reset password failed" };
-  }
+  const res = await API.post('/reset-password', data);
+  return res.data;
 };
+
+export default API;

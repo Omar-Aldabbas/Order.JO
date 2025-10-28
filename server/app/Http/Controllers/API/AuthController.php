@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -20,19 +21,18 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|confirmed|min:6',
-        ], [
-            'email.unique' => 'This email is already registered.',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
+            'role' => 'user'
         ]);
 
-        $user->assignRole('user');
+        // $user->assignRole('user');
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'access_token' => $token,
@@ -48,27 +48,27 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$token = JWTAuth::attempt($credentials)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user = auth()->user();
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => $user,
-            'role' => $user->getRoleNames()->first()
+            'role' => 'user',
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json([
             'message' => 'Logged out successfully',
@@ -97,9 +97,8 @@ class AuthController extends Controller
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
+                $user->forceFill(['password' => Hash::make($password)])
+                     ->setRememberToken(Str::random(60));
                 $user->save();
                 event(new PasswordReset($user));
             }

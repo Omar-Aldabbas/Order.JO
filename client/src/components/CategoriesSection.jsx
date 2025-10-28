@@ -18,6 +18,7 @@ export const CategoriesSection = () => {
                     alt: cat.alt,
                     name:cat.name,
                     additiontext: cat.additiontext,
+                    link: cat.link,
                 }}/>
             ))
         }

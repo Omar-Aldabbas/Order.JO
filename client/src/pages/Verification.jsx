@@ -23,8 +23,8 @@ export const Verification = () => {
   })
 
   return (
-    <div className="container min-h-screen flex justify-center itmes-center flex-col">
-      <div className="flex flex-col justify-center items-center overflow-hidden bg-secondary  xl:flex-row">
+    <div className="container min-h-screen bg-secondary flex justify-center itmes-center flex-col ">
+      <div className="flex flex-col justify-center items-center overflow-hidden xl:flex-row relative bg-secondary">
         {/* TOP */}
         <div className=" text-foreground text-center flex flex-col items-center justify-center  min-h-[30vh] xl:min-h-screen xl:min-w-[30vw]">
           <h2 className="capitalize font-semibold text-2xl tracking-widest">
@@ -52,19 +52,19 @@ export const Verification = () => {
                 />
               ))}
             </div>
- 
+
             {/* button */}
             <button
               type="submit"
               className="uppercase w-full lg:max-w-[50vw] bg-primary  text-foreground p-4 text-center rounded-lg hover:bg-secondary active:bg-secondary active:outline-primary active:outline-2 transition-colors duration-400 "
             >
-               verify 
+              verify
             </button>
           </form>
           <div className="flex flex-col justify-center items-center gap-2 mt-4">
             <span className="text-sm text-gray-600 text-center mt-1">
               {'  '}
-              Go back to 
+              Go back to
               {'  '}
               <Link
                 to="/login"
